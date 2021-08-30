@@ -1,23 +1,28 @@
+function remove_underbar(str) {
+    return str.replace(/_/gi, ' ');
+}
+
 function get_shortstring(str) {
-    if(str.Length > 5) {
-        str = str + '..';
+    const lim = 7;
+    if(str.length > lim) {
+        str = str.slice(0, lim - 2) + '..';
     }
     return str;
 }
 
 function load_datalist() {
     var list = '<ul>';
-    fs.readdir('data/', function(err, filelist) {
-        filelist.forEach(file => {
-            list += `<li><a href = "/?id=${element}">${element}</a></li>`
-        });
+    filelist = fs.readdirSync('data/');
+    filelist.forEach(file => {
+        var element = get_shortstring(remove_underbar(file));
+        list += `<li><a href = "/?id=${file}">${element}</a></li>`
     });
     list += '</ul>';
     return list;
 }
 
 function load_template(desc, title) {
-    title = title.replace(/_/gi, ' ');
+    title = remove_underbar(title);
     var list = load_datalist();
     console.log(list);
 
@@ -32,11 +37,7 @@ function load_template(desc, title) {
             <h1><a href="/">백병전</a></h1>
             <div id="grid">
                 <div>
-                    <ul>
-                        <li><a href="/?id=백병전에서도_총은_필수다">백병전에서.. </a></li>
-                        <li><a href="/?id=역사_및_특징">역사 및 특징</a></li>
-                        <li><a href="/?id=고통">고통</a></li>
-                    </ul>
+                    ${list}
                 </div>
                 <div>
                     <h2>${title}</h2>
@@ -49,6 +50,7 @@ function load_template(desc, title) {
     return template;
 }
 
+console.log(get_shortstring('hellooooo'));
 var http = require('http');
 var fs = require('fs');
 var url = require('url');
