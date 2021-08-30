@@ -1,3 +1,8 @@
+var http = require('http');
+var fs = require('fs');
+var url = require('url');
+var qs = require('querystring');
+
 function remove_underbar(str) {
     return str.replace(/_/gi, ' ');
 }
@@ -36,6 +41,7 @@ function load_template(desc, title) {
             <div id="grid">
                 <div>
                     ${list}
+                    <a href = "/create"> create</a>
                 </div>
                 <div>
                     <h2>${title}</h2>
@@ -48,18 +54,13 @@ function load_template(desc, title) {
     return template;
 }
 
-console.log(get_shortstring('hellooooo'));
-var http = require('http');
-var fs = require('fs');
-var url = require('url');
 var app = http.createServer(function(request,response){
     var _url = request.url;
-    console.log(url.parse(_url, true));
     var pathname = url.parse(_url, true).pathname;
     var queryData = url.parse(_url, true).query;
+    console.log(pathname);
     if(pathname == '/'){
-        var title, desc;
-        response.writeHead(200);
+        var title, desc, template;
         if(queryData.id == undefined) {
             title = 'Welcome';
             desc = 'Hello, Node.js';
@@ -68,7 +69,40 @@ var app = http.createServer(function(request,response){
             title = queryData.id;
             desc = fs.readFileSync(`data/${title}`, 'utf-8');
         }
+        template = load_template(desc, title);
+        response.writeHead(200);
+        response.end(template);
+    }
+    else if(pathname == '/create') {
+        var title, desc, template;
+        title = '백병전 - create';
+        desc = 
+        `<form action = "http://localhost:3000/create_process" method = "post">
+            <p><input type="text" name = "title" placeholder = 'title'></p>
+            <p>
+                <textarea name = "description" placeholder = 'description'></textarea>
+            </p>
+            <p>
+                <input type="submit">
+            </p>
+        </form>`;
+        template = load_template(desc, title);
+        response.writeHead(200);
         response.end(load_template(desc, title));
+    } 
+    else if(pathname == "/create_process") {
+        var body = '';
+        request.on('data', function(data) {
+            body = body + data;
+        });
+        request.on('end', function() {
+            var post = qs.parse(body);
+            var title = post.title;
+            var desc = post.description;
+            console.log(post.title);
+        });
+        response.writeHead(200);
+        response.end('success');
     }
     else {
         response.writeHead(404);
