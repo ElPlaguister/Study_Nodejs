@@ -1,7 +1,8 @@
 function get_shortstring(str) {
     if(str.Length > 5) {
-        str = 
+        str = str + '..';
     }
+    return str;
 }
 
 function load_datalist() {
