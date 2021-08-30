@@ -1,6 +1,25 @@
+function get_shortstring(str) {
+    if(str.Length > 5) {
+        str = 
+    }
+}
+
+function load_datalist() {
+    var list = '<ul>';
+    fs.readdir('data/', function(err, filelist) {
+        filelist.forEach(file => {
+            list += `<li><a href = "/?id=${element}">${element}</a></li>`
+        });
+    });
+    list += '</ul>';
+    return list;
+}
+
 function load_template(desc, title) {
     title = title.replace(/_/gi, ' ');
-    console.log('title: ' + title);
+    var list = load_datalist();
+    console.log(list);
+
     var template = `
     <!doctype html>
     <html>
