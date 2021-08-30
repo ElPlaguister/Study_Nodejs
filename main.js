@@ -24,8 +24,6 @@ function load_datalist() {
 function load_template(desc, title) {
     title = remove_underbar(title);
     var list = load_datalist();
-    console.log(list);
-
     var template = `
     <!doctype html>
     <html>
@@ -57,23 +55,21 @@ var url = require('url');
 var app = http.createServer(function(request,response){
     var _url = request.url;
     console.log(url.parse(_url, true));
-    var queryData = url.parse(_url, true).query;
     var pathname = url.parse(_url, true).pathname;
-    var title = '';
+    var queryData = url.parse(_url, true).query;
     if(pathname == '/'){
+        var title, desc;
         response.writeHead(200);
         if(queryData.id == undefined) {
             title = 'Welcome';
             desc = 'Hello, Node.js';
-            response.end(load_template(desc, title));
         }
         else {
             title = queryData.id;
-            fs.readFile(`data/${title}`, 'utf-8', function(err, desc) {
-                response.end(load_template(desc, title));
-            });
+            desc = fs.readFileSync(`data/${title}`, 'utf-8');
         }
-    } 
+        response.end(load_template(desc, title));
+    }
     else {
         response.writeHead(404);
         response.end('Not found');
