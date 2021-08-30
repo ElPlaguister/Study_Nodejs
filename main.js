@@ -26,7 +26,7 @@ function load_datalist() {
     return list;
 }
 
-function load_template(desc, title) {
+function load_template(desc, title, control) {
     title = remove_underbar(title);
     var list = load_datalist();
     var template = `
@@ -41,7 +41,7 @@ function load_template(desc, title) {
             <div id="grid">
                 <div>
                     ${list}
-                    <a href = "/create"> create</a>
+                    ${control}
                 </div>
                 <div>
                     <h2>${title}</h2>
@@ -60,16 +60,18 @@ var app = http.createServer(function(request,response){
     var queryData = url.parse(_url, true).query;
     console.log(pathname);
     if(pathname == '/'){
-        var title, desc, template;
+        var title, desc, control, template;
         if(queryData.id == undefined) {
             title = 'Welcome';
             desc = 'Hello, Node.js';
+            control = '<a href = "/create"> create</a>';
         }
         else {
             title = queryData.id;
             desc = fs.readFileSync(`data/${title}`, 'utf-8');
+            control = `<a href = "/create"> create</a><a href = "/update?id=${title}"> update</a>`;
         }
-        template = load_template(desc, title);
+        template = load_template(desc, title, control);
         response.writeHead(200);
         response.end(template);
     }
@@ -80,29 +82,67 @@ var app = http.createServer(function(request,response){
         `<form action = "http://localhost:3000/create_process" method = "post">
             <p><input type="text" name = "title" placeholder = 'title'></p>
             <p>
-                <textarea name = "description" placeholder = 'description'></textarea>
+                <textarea name = "desc" placeholder = 'description'></textarea>
             </p>
             <p>
                 <input type="submit">
             </p>
         </form>`;
-        template = load_template(desc, title);
+        template = load_template(desc, title, '');
         response.writeHead(200);
-        response.end(load_template(desc, title));
+        response.end(template);
     } 
     else if(pathname == "/create_process") {
         var body = '';
         request.on('data', function(data) {
-            body = body + data;
+            body += data;
         });
         request.on('end', function() {
             var post = qs.parse(body);
             var title = post.title;
-            var desc = post.description;
-            console.log(post.title);
+            var desc = post.desc;
+            fs.writeFile(`data/${title}`, desc, 'utf-8', function(err) {
+                response.writeHead(302, {Location: `/?id=${title}`});
+                response.end();   
+            });
         });
-        response.writeHead(200);
-        response.end('success');
+    }
+    else if(pathname =='/update') {
+        fs.readFile(`data/${queryData.id}`, 'utf-8', function(err, desc) {
+            var title = queryData.id;
+            var _desc = `<form action = "/update_process" method = "post">
+                <input type="hidden" name="id" value=${title}>
+                <p><input type="text" name = "title" placeholder = 'title' value = ${title}></p>
+                <p>
+                    <textarea name = "desc" placeholder = 'description'>${desc}</textarea>
+                </p>
+                <p>
+                    <input type="submit">
+                </p>
+            </form>`;
+            var control = ``;
+            var template = load_template(_desc, title, control);
+            response.writeHead(200);
+            response.end(template);
+        })
+    }
+    else if(pathname == '/update_process') {
+        var body = '';
+        request.on('data', function(data) {
+            body += data;
+        });
+        request.on('end', function() {
+            var post = qs.parse(body);
+            var id = post.id;
+            var title = post.title;
+            var desc = post.desc;
+            fs.rename(`data/${id}`, `data/${title}`, function(err) {
+                fs.writeFile(`data/${title}`, desc, 'utf-8', function(err) {
+                    response.writeHead(302, {Location: `/?id=${title}`});
+                    response.end();   
+                });
+            });
+        });
     }
     else {
         response.writeHead(404);

@@ -7,4 +7,8 @@ function get_shortstring(str) {
     return str;
 }
 
-console.log(get_shortstring('helooooooooooo'));
+function remove_underbar(str) {
+    return str.replace(/_/gi, ' ');
+}
+
+console.log(get_shortstring(remove_underbar('Node.js')));
