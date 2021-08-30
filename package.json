@@ -1,0 +1,25 @@
+{
+  "name": "study_nodejs",
+  "version": "1.0.0",
+  "description": "with JavaScript > You can visit my web project : https://elplaguister.github.io/Study_Nodejs/",
+  "main": "main.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ElPlaguister/Study_Nodejs.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ElPlaguister/Study_Nodejs/issues"
+  },
+  "homepage": "https://github.com/ElPlaguister/Study_Nodejs#readme",
+  "dependencies": {
+    "sanitize-html": "^2.4.0"
+  }
+}
