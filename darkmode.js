@@ -14,7 +14,7 @@ var Body = {
     }
 }
 function DarkmodeHandler(self) {
-    var target = document.querySelector('body');
+    console.log(document)
     // 링크텍스트컬러, 버튼텍스트, body배경컬러, body텍스트컬러
     var acolor, nextValue, backColor, fontColor;
     if(self.value == 'dark') {

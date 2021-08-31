@@ -2,10 +2,11 @@ var http = require('http');
 var fs = require('fs');
 var url = require('url');
 var qs = require('querystring');
-var template = require('./lib/template.js');
 var path = require('path');
+var sanitizeHtml = require('sanitize-html');
+var template = require('./lib/template.js');
 
-var app = http.createServer(function(request,response){
+http.createServer(function(request,response){
     var _url = request.url;
     var pathname = url.parse(_url, true).pathname;
     var queryData = url.parse(_url, true).query;
@@ -22,6 +23,7 @@ var app = http.createServer(function(request,response){
                 title = queryData.id;
                 var filteredId = path.parse(queryData.id).base;
                 desc = fs.readFileSync(`data/${filteredId}`, 'utf-8');
+                title = sanitizeHtml(title);
                 control = `
                 <a href = "/create"> create</a>
                 <a href = "/update?id=${title}"> update</a>
@@ -31,7 +33,6 @@ var app = http.createServer(function(request,response){
                 </form>
                 `;
             }
-            console.log(filelist);
             var list = template.list(filelist);
             var html = template.html(title, list, desc, control);
             response.writeHead(200);
@@ -129,5 +130,4 @@ var app = http.createServer(function(request,response){
             response.end('Not found');
         }
     });
-});
-app.listen(3000);
+}).listen(3000);
